@@ -1,0 +1,3 @@
+from .location.province import PlaceProvinceSchema, CreatePlaceProvinceSchema, UpdatePlaceProvinceSchema, ResponsePlaceProvince
+from .location.district import PlaceDistrictSchema, CreatePlaceDistrictSchema, UpdatePlaceDistrictSchema, ResponsePlaceDistrict
+from .location.wards import PlaceWardsSchema, CreatePlaceWardsSchema, UpdatePlaceWardsSchema, ResponsePlaceWards

@@ -1,0 +1,14 @@
+fastapi[standard]
+uvicorn[standard]
+SQLAlchemy
+SQLAlchemy-Utils
+pydantic>=2.8.2
+pydantic_core
+pydantic-settings
+pydantic[email]
+psycopg2-binary>=2.9.9
+requests~=2.28.2
+python-magic~=0.4.27
+aiofiles==23.1.0
+alembic==1.10.0
+tenacity
