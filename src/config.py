@@ -37,12 +37,10 @@ class Settings(BaseSettings):
             scheme="postgresql",
             username=getenv("POSTGRES_USER"),
             password=getenv("POSTGRES_PASSWORD"),
-            host=getenv("SQL_HOST", ""),
+            host=getenv("POSTGRES_HOST", ""),
             port=int(getenv("POSTGRES_PORT", "5432")),
             path=f"{getenv('AVATAR_APP_DB') or '/'}",
         )
 
 
 settings = Settings()
-
-print(settings.model_dump())
