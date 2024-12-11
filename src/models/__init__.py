@@ -1,4 +1,3 @@
-
-from .locations.province import ProvinceModel
-from .locations.district import DistrictModel
-from .locations.wards import WardsModel
+from .geography.province import ProvinceGeographyModel
+from .geography.district import DistrictGeographyModel
+from .geography.ward import WardGeographyModel

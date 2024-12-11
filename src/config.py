@@ -1,22 +1,27 @@
+from enum import Enum
 from os import getenv
-from typing import Optional, Any, List, Union
-from pydantic import Field, PostgresDsn, field_validator, AnyHttpUrl
+from typing import List, Union
+from pydantic import Field, field_validator, AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-''' Project setting '''
+""" Project setting """
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="AVATAR_")
+class EnviromentOption(Enum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
 
-    APP_NAME: str = ""
-    APP_API_PREFIX: str = ""
-    APP_DOMAIN: str = getenv("AVATAR_APP_DOMAIN", "http://zkit.local")
-    APP_ENV: str = getenv("AVATAR_APP_ENV", "development")
-    APP_PORT: str = getenv("AVATAR_APP_PORT", "80")
+
+class AppSetting(BaseSettings):
+    APP_NAME: str = Field(default="AppName")
+    APP_API_PREFIX: str = Field(default="/api/v1")
+    APP_ENV: Union[EnviromentOption, str] = Field(default="development")
+    APP_PORT: int = Field(default=8000)
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
-        "BACKEND_CORS_ORIGINS", [])
+        "BACKEND_CORS_ORIGINS", []
+    )
 
     @field_validator("BACKEND_CORS_ORIGINS")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
@@ -26,21 +31,39 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @field_validator("SQLALCHEMY_DATABASE_URI")
-    def db_connection(cls, v: Optional[str]) -> Any:
-        if isinstance(v, str):
-            return v
+class PostgresSetting(BaseSettings):
+    POSTGRES_USER: str = getenv("POSTGRES_USER", "postgres")
+    POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
+    POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
+    POSTGRES_PORT: int = int(getenv("POSTGRES_PORT", 5432))
+    POSTGRES_DB: str = getenv("AVATAR_APP_DB", "avatars")
+    POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
+    POSTGRES_ASYNC_PREFIX: str = getenv(
+        "POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://"
+    )
+    POSTGRES_URI: str = (
+        f"{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    )
 
-        return PostgresDsn.build(
-            scheme="postgresql",
-            username=getenv("POSTGRES_USER"),
-            password=getenv("POSTGRES_PASSWORD"),
-            host=getenv("POSTGRES_HOST", ""),
-            port=int(getenv("POSTGRES_PORT", "5432")),
-            path=f"{getenv('AVATAR_APP_DB') or '/'}",
-        )
+
+class RedisCacheSetting(BaseSettings):
+    REDIS_CACHE_HOST: str = getenv("REDIS_HOST", "redis")
+    REDIS_CACHE_PASSWORD: str = getenv("REDIS_PASSWORD", "secret")
+    REDIS_CACHE_PORT: int = int(getenv("REDIS_PORT", 6379))
+
+    REDIS_CACHE_URL: str = (
+        f"redis://:{REDIS_CACHE_PASSWORD}@{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}"
+    )
+
+
+class Settings(
+    AppSetting,
+    PostgresSetting,
+    RedisCacheSetting,
+):
+    model_config = SettingsConfigDict(env_prefix="AVATAR_")
+    pass
 
 
 settings = Settings()
