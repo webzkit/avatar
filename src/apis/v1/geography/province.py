@@ -1,5 +1,5 @@
 from typing import Annotated, Any, Union
-from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from crud.geography.province import province_geography_curd as crud
 from core import message
@@ -8,8 +8,9 @@ from core.paginated import PaginatedListResponse, compute_offset, paginated_resp
 from schemas.geography.province import (
     ProvinceGeographyRead as Read,
     ProvinceGeographyCreate as Create,
-    ProvinceGeographyCreateInternal as CreateInernal,
+    ProvinceGeographyCreateInternal as CreateInternal,
     ProvinceGepgraphyUpdate as Update,
+    ProvinceGeographyUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db
 from core.paginated import (
@@ -66,25 +67,19 @@ async def get(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     data_request: Create,
-    request_init_data: Annotated[Union[str, None], Header()] = None,
 ) -> Response:
-    print(request_init_data)
     exists = await crud.exists(db=db, name=data_request.name)
     if exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
         )
 
-    data_internal_dict = data_request.model_dump()
-    print(data_internal_dict)
-    data_internal_dict["created_by"] = 1
+    data_internal = CreateInternal(**await request.json())
 
-    data_internal = CreateInernal(**data_internal_dict)
-
-    # await crud.create(db=db, object=data_internal)
-
+    await crud.create(db=db, object=data_internal)
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.CREATE_SUCCEED}
     )
@@ -92,7 +87,7 @@ async def create(
 
 @router.put("/{id}", status_code=status.HTTP_200_OK)
 async def update(
-    *,
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
     data_request: Update,
@@ -104,7 +99,8 @@ async def update(
             status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    await crud.update(db=db, object=data_request, id=id)
+    data_internal = UpdateInternal(**await request.json())
+    await crud.update(db=db, object=data_internal, id=id)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}

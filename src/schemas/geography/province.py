@@ -27,7 +27,7 @@ class ProvinceGeographyCreate(ProvinceGeographyBase):
     pass
 
 
-class ProvinceGeographyCreateInternal(ProvinceGeographyCreate):
+class ProvinceGeographyCreateInternal(ProvinceGeographyBase):
     created_by: int
 
 
@@ -36,7 +36,8 @@ class ProvinceGepgraphyUpdate(BaseModel):
 
 
 class ProvinceGeographyUpdateInternal(ProvinceGepgraphyUpdate):
-    updated_at: datetime
+    # updated_at: datetime
+    updated_by: Optional[int] = None
 
 
 class ProvinceGeographyDelete(BaseModel):

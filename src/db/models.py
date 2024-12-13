@@ -1,14 +1,25 @@
 import uuid as uuid_pkg
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, MappedAsDataclass, mapped_column
 
 
+class OwnerMixin(MappedAsDataclass):
+    created_by: Mapped[int] = mapped_column(Integer, nullable=False, kw_only=True)
+    updated_by: Mapped[int] = mapped_column(
+        Integer, nullable=True, default=None, kw_only=True
+    )
+
+
 class UUIDMixin(MappedAsDataclass):
     uuid: Mapped[uuid_pkg.UUID] = mapped_column(
-        UUID, primary_key=True, default=uuid_pkg.uuid4(), unique=True, kw_only=True,
+        UUID,
+        primary_key=True,
+        default=uuid_pkg.uuid4(),
+        unique=True,
+        kw_only=True,
     )
 
 

@@ -1,8 +1,8 @@
-"""make tables geographycal
+"""make geograpy tables
 
-Revision ID: 377c08d6f9c4
+Revision ID: 4ab7615a26ea
 Revises: 
-Create Date: 2024-12-11 16:50:50.436889
+Create Date: 2024-12-13 15:02:48.681521
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '377c08d6f9c4'
+revision = '4ab7615a26ea'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,6 +22,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('created_by', sa.Integer(), nullable=False),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
@@ -32,8 +33,9 @@ def upgrade() -> None:
     op.create_table('geography_districts',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
-    sa.Column('created_by', sa.Integer(), nullable=False),
     sa.Column('geography_provinces_id', sa.Integer(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=False),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
@@ -46,8 +48,9 @@ def upgrade() -> None:
     op.create_table('geography_wards',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
-    sa.Column('created_by', sa.Integer(), nullable=False),
     sa.Column('geography_districts_id', sa.Integer(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=False),
+    sa.Column('updated_by', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),

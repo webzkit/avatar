@@ -14,6 +14,7 @@ from config import (
     RedisCacheSetting,
     PostgresSetting,
 )
+from middlewares.set_created_by import MakeCreatedByMiddleware
 
 
 # Cache
@@ -60,6 +61,9 @@ def create_application(
 
     lifespan = lifespan_factory(settings)
     application = FastAPI(lifespan=lifespan, **kwargs)
+
+    # Add middleware
+    application.add_middleware(MakeCreatedByMiddleware)  # pyright: ignore
 
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.APP_API_PREFIX)

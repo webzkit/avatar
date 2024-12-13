@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import String, ForeignKey
 from db.database import Base
-from db.models import TimestampMixin, SoftDeleteMixin
+from db.models import OwnerMixin, TimestampMixin, SoftDeleteMixin
 
 
-class WardGeographyModel(TimestampMixin, SoftDeleteMixin, Base):
+class WardGeographyModel(OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "geography_wards"
 
     id: Mapped[int] = mapped_column(
@@ -17,7 +17,6 @@ class WardGeographyModel(TimestampMixin, SoftDeleteMixin, Base):
     )
 
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    created_by: Mapped[int] = mapped_column(Integer)
 
     geography_districts_id: Mapped[int] = mapped_column(
         ForeignKey("geography_districts.id"), index=True, default=1
