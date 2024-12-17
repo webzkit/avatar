@@ -18,6 +18,6 @@ class DistrictGeographyModel(OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
 
     name: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    geography_provinces_id: Mapped[int] = mapped_column(
+    geography_province_id: Mapped[int] = mapped_column(
         ForeignKey("geography_provinces.id"), index=True, default=1
     )

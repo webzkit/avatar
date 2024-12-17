@@ -7,7 +7,7 @@ from schemas.geography.province import (
 )
 from models.geography.province import ProvinceGeographyModel
 
-CRUDGroup = FastCRUD[
+ProvinceCRUD = FastCRUD[
     ProvinceGeographyModel,
     ProvinceGeographyCreateInternal,
     ProvinceGepgraphyUpdate,
@@ -15,4 +15,4 @@ CRUDGroup = FastCRUD[
     ProvinceGeographyDelete,
 ]
 
-province_geography_curd = CRUDGroup(ProvinceGeographyModel)
+province_geography_curd = ProvinceCRUD(ProvinceGeographyModel)

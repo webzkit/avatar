@@ -36,7 +36,6 @@ class ProvinceGepgraphyUpdate(BaseModel):
 
 
 class ProvinceGeographyUpdateInternal(ProvinceGepgraphyUpdate):
-    # updated_at: datetime
     updated_by: Optional[int] = None
 
 
