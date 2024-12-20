@@ -25,6 +25,8 @@ from core.paginated import (
     SingleResponse,
 )
 from schemas.geography.province import ProvinceGeographyRelationship
+from core.helpers.cache import create_or_read_cache
+
 
 JOIN_PREFIX = "district_"
 JOIN_PREFIX_SECOND = "province_"
@@ -77,7 +79,9 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
+@create_or_read_cache(key_prefix="users:result", expiration=3600)
 async def get(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:

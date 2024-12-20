@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field
 from db.schemas import TimestampSchema, PersistentDeletion
 
@@ -21,6 +21,9 @@ class WardGeographyRead(WardGeographyBase):
     created_at: datetime
     district: DistrictGeographyRelationship
     province: ProvinceGeographyRelationship
+    created_by: int
+
+    extends: Optional[Dict[str, Any]] = None
 
 
 class WardGeographyCreate(WardGeographyBase):

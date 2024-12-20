@@ -6,7 +6,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
-from core.helpers import cache
+from .helpers import cache
 from config import (
     EnviromentOption,
     settings,

@@ -84,13 +84,11 @@ async def _delete_keys_by_pattern(pattern: str) -> None:
             await client.delete(*keys)
 
 
-def cache(
+def create_or_read_cache(
     key_prefix: str,
     resource_id_name: Any = None,
     expiration: int = 3600,
     resource_id_type: type | tuple[type, ...] = int,
-    to_invalidate_extra: dict[str, Any] | None = None,
-    pattern_to_invalidate_extra: list[str] | None = None,
 ) -> Callable:
     def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
@@ -107,40 +105,27 @@ def cache(
 
             formatted_key_prefix = _format_prefix(key_prefix, kwargs)
             cache_key = f"{formatted_key_prefix}:{resource_id}"
-            if request.method == "GET":
-                if (
-                    to_invalidate_extra is not None
-                    or pattern_to_invalidate_extra is not None
-                ):
-                    raise InvalidRequestError
-
-                cached_data = await client.get(cache_key)
-                if cached_data:
-                    return json.loads(cached_data.decode())
 
             result = await func(request, *args, **kwargs)
 
             if request.method == "GET":
-                serializable_data = jsonable_encoder(result)
-                serialized_data = json.dumps(serializable_data)
+                cached_data = await client.get(cache_key)
 
-                await client.set(cache_key, serialized_data)
-                await client.expire(cache_key, expiration)
+                if cached_data:
+                    result_cache = json.loads(cached_data.decode())
+                    result["data"]["extends"] = {"user": result_cache["data"]}
 
-                serialized_data = json.loads(serialized_data)
+            # result = await func(request, *args, **kwargs)
 
-            else:
-                await client.delete(cache_key)
-                if to_invalidate_extra is not None:
-                    formatted_extra = _format_extra_data(to_invalidate_extra, kwargs)
-                    for prefix, id in formatted_extra.items():
-                        extra_cache_key = f"{prefix}:{id}"
-                        await client.delete(extra_cache_key)
+            if request.method == "GET":
+                # serializable_data = jsonable_encoder(result)
+                # serialized_data = json.dumps(serializable_data)
 
-                if pattern_to_invalidate_extra is not None:
-                    for pattern in pattern_to_invalidate_extra:
-                        formatted_pattern = _format_prefix(pattern, kwargs)
-                        await _delete_keys_by_pattern(formatted_pattern + "*")
+                # await client.set(cache_key, serialized_data)
+                # await client.expire(cache_key, expiration)
+
+                # serialized_data = json.loads(serialized_data)
+                pass
 
             return result
 
