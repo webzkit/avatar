@@ -86,9 +86,6 @@ async def _delete_keys_by_pattern(pattern: str) -> None:
 
 def create_or_read_cache(
     key_prefix: str,
-    resource_id_name: Any = None,
-    expiration: int = 3600,
-    resource_id_type: type | tuple[type, ...] = int,
 ) -> Callable:
     def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
@@ -96,36 +93,17 @@ def create_or_read_cache(
             if client is None:
                 raise MissingClientError
 
-            if resource_id_name:
-                resource_id = kwargs[resource_id_name]
-            else:
-                resource_id = _infer_resource_id(
-                    kwargs=kwargs, resource_id_type=resource_id_type
-                )
-
-            formatted_key_prefix = _format_prefix(key_prefix, kwargs)
-            cache_key = f"{formatted_key_prefix}:{resource_id}"
-
             result = await func(request, *args, **kwargs)
-
+            print(result)
             if request.method == "GET":
+                cache_key = f"{key_prefix}:1"
                 cached_data = await client.get(cache_key)
 
                 if cached_data:
                     result_cache = json.loads(cached_data.decode())
                     result["data"]["extends"] = {"user": result_cache["data"]}
 
-            # result = await func(request, *args, **kwargs)
-
-            if request.method == "GET":
-                # serializable_data = jsonable_encoder(result)
-                # serialized_data = json.dumps(serializable_data)
-
-                # await client.set(cache_key, serialized_data)
-                # await client.expire(cache_key, expiration)
-
-                # serialized_data = json.loads(serialized_data)
-                pass
+                result = await func(request, *args, **kwargs)
 
             return result
 
