@@ -13,6 +13,7 @@ from config import (
     AppSetting,
     RedisCacheSetting,
     PostgresSetting,
+    ServiceSetting,
 )
 from middlewares.set_created_by import MakeCreatedByMiddleware
 
@@ -28,7 +29,7 @@ async def close_redis_cache_pool() -> None:
 
 
 def lifespan_factory(
-    settings: AppSetting | RedisCacheSetting | PostgresSetting,
+    settings: AppSetting | RedisCacheSetting | PostgresSetting | ServiceSetting,
 ) -> Callable[[FastAPI], _AsyncGeneratorContextManager[Any]]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
@@ -45,7 +46,7 @@ def lifespan_factory(
 # Create Applications
 def create_application(
     router: APIRouter,
-    settings: AppSetting | RedisCacheSetting | PostgresSetting,
+    settings: AppSetting | RedisCacheSetting | PostgresSetting | ServiceSetting,
     **kwargs: Any
 ) -> FastAPI:
     if isinstance(settings, AppSetting):

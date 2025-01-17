@@ -57,11 +57,13 @@ class RedisCacheSetting(BaseSettings):
     )
 
 
-class Settings(
-    AppSetting,
-    PostgresSetting,
-    RedisCacheSetting,
-):
+class ServiceSetting(BaseSettings):
+    ENGINE_SERVICE_URL: str = getenv("ENGINE_SERVICE_URL", "")
+    OWNER_ENGINE_SERVICE_URL: str = getenv("/api/v1/users/", "")
+    HTTP_TIMEOUT_SERVICE: int = int(getenv("HTTP_TIMEOUT_SERVICE", 59))
+
+
+class Settings(AppSetting, PostgresSetting, RedisCacheSetting, ServiceSetting):
     model_config = SettingsConfigDict(env_prefix="AVATAR_")
     pass
 

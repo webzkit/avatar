@@ -18,10 +18,15 @@ from core.paginated import (
     PaginatedListResponse,
     SingleResponse,
 )
-from core.helpers.cache import create_or_read_cache
+from core.helpers.cache import get_service_related
+from config import settings
 
 
 router = APIRouter()
+
+URL_OWNER_SERVICE = settings.ENGINE_SERVICE_URL
+PATH_OWNER_SERVICE = settings.OWNER_ENGINE_SERVICE_URL
+KEY_PREFIX_OWNER_SERVICE = "users:result"
 
 
 @router.get(
@@ -46,7 +51,16 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
-@create_or_read_cache(key_prefix="users:result")
+@get_service_related(
+    key_prefix="users:result",
+    related=[
+        {
+            "service_host": URL_OWNER_SERVICE,
+            "service_path": PATH_OWNER_SERVICE,
+            "key_prefix": KEY_PREFIX_OWNER_SERVICE,
+        }
+    ],
+)
 async def get(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],

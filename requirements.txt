@@ -1,5 +1,5 @@
-fastapi[standard]
-uvicorn[standard]
+fastapi~=0.115.6
+uvicorn~=0.34.0
 SQLAlchemy
 SQLAlchemy-Utils
 pydantic>=2.8.2
@@ -14,7 +14,12 @@ alembic==1.10.0
 tenacity
 fastcrud==0.15.1
 asyncpg==0.30.0
+
 redis~=5.0.1
 arq~=0.25.0
+
+async-timeout==4.0.3
+aiohttp==3.10.5
+aiodns==3.2.0
 
 aiokafka==0.12.0

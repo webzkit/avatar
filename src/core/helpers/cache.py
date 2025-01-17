@@ -1,91 +1,23 @@
 import functools
 import json
-import re
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from fastapi import Request, Response
-from fastapi.encoders import jsonable_encoder
 from redis.asyncio import ConnectionPool, Redis
 
 from ..exceptions.cache_exception import (
-    CacheIdentificationInferenceError,
-    InvalidRequestError,
     MissingClientError,
 )
+
+from core.http.client import call_to_service
 
 pool: ConnectionPool | None = None
 client: Redis | None = None
 
 
-def _infer_resource_id(
-    kwargs: dict[str, Any], resource_id_type: type | tuple[type, ...]
-) -> int | str:
-    resource_id: int | str | None = None
-    for arg_name, arg_value in kwargs.items():
-        if isinstance(arg_value, resource_id_type):
-            if (resource_id_type is int) and ("id" in arg_name):
-                resource_id = arg_value
-
-            elif (resource_id_type is int) and ("id" not in arg_name):
-                pass
-
-            elif resource_id_type is str:
-                resource_id = arg_value
-
-    if resource_id is None:
-        raise CacheIdentificationInferenceError
-
-    return resource_id
-
-
-def _extract_data_inside_brackets(input_string: str) -> list[str]:
-    data_inside_brackets = re.findall(r"{(.*?)}", input_string)
-
-    return data_inside_brackets
-
-
-def _construct_data_dict(
-    data_inside_brackets: list[str], kwargs: dict[str, Any]
-) -> dict[str, Any]:
-    data_dict = {}
-    for key in data_inside_brackets:
-        data_dict[key] = kwargs[key]
-    return data_dict
-
-
-def _format_prefix(prefix: str, kwargs: dict[str, Any]) -> str:
-    data_inside_brackets = _extract_data_inside_brackets(prefix)
-    data_dict = _construct_data_dict(data_inside_brackets, kwargs)
-    formatted_prefix = prefix.format(**data_dict)
-    return formatted_prefix
-
-
-def _format_extra_data(
-    to_invalidate_extra: dict[str, str], kwargs: dict[str, Any]
-) -> dict[str, Any]:
-    formatted_extra = {}
-    for prefix, id_template in to_invalidate_extra.items():
-        formatted_prefix = _format_prefix(prefix, kwargs)
-        id = _extract_data_inside_brackets(id_template)[0]
-        formatted_extra[formatted_prefix] = kwargs[id]
-
-    return formatted_extra
-
-
-async def _delete_keys_by_pattern(pattern: str) -> None:
-    if client is None:
-        raise MissingClientError
-
-    cursor = -1
-    while cursor != 0:
-        cursor, keys = await client.scan(cursor, match=pattern, count=100)
-        if keys:
-            await client.delete(*keys)
-
-
-def create_or_read_cache(
-    key_prefix: str,
+def get_service_related(
+    key_prefix: str, related: Optional[List[dict]] = None
 ) -> Callable:
     def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
@@ -94,19 +26,40 @@ def create_or_read_cache(
                 raise MissingClientError
 
             result = await func(request, *args, **kwargs)
-            print(result)
+
+            if not related:
+                return result
+
             if request.method == "GET":
+                for relate in related:
+                    await get_relate(relate, id=1)
+
                 cache_key = f"{key_prefix}:1"
                 cached_data = await client.get(cache_key)
 
                 if cached_data:
                     result_cache = json.loads(cached_data.decode())
-                    result["data"]["extends"] = {"user": result_cache["data"]}
+                    result["data"]["owner"] = result_cache["data"]
 
-                result = await func(request, *args, **kwargs)
+                else:
+                    url = "http://engine:8000/api/v1/users/1"
+                    resp_data, status_code_from_service = await call_to_service(
+                        request=request,
+                        url=url,
+                        method=request.method,
+                        payload={},
+                        service_headers=request.headers,
+                        request_param={},
+                    )
+                    result["data"]["owner"] = resp_data["data"]
 
             return result
 
         return inner
 
     return wrapper
+
+
+async def get_relate(relate: Any, id: int):
+    cache_key = f"{relate.get('key_prefix')}:{id}"
+    print(cache_key)
