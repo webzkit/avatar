@@ -6,7 +6,8 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
-from .helpers import cache
+from .caches import relate
+
 from config import (
     EnviromentOption,
     settings,
@@ -15,17 +16,18 @@ from config import (
     PostgresSetting,
     ServiceSetting,
 )
+
 from middlewares.set_created_by import MakeCreatedByMiddleware
 
 
-# Cache
-async def create_redis_cache_pool() -> None:
-    cache.pool = redis.ConnectionPool.from_url(settings.REDIS_CACHE_URL)
-    cache.client = redis.Redis.from_pool(cache.pool)  # pyright: ignore
+# Cache Relate
+async def create_redis_relate_pool() -> None:
+    relate.pool = redis.ConnectionPool.from_url(settings.REDIS_CACHE_URL)
+    relate.client = redis.Redis.from_pool(relate.pool)  # pyright: ignore
 
 
-async def close_redis_cache_pool() -> None:
-    await cache.client.aclose()  # type: ignore
+async def close_redis_relate_pool() -> None:
+    await relate.client.aclose()  # type: ignore
 
 
 def lifespan_factory(
@@ -34,11 +36,11 @@ def lifespan_factory(
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
         if isinstance(settings, RedisCacheSetting):
-            await create_redis_cache_pool()
+            await create_redis_relate_pool()
         yield
 
         if isinstance(settings, RedisCacheSetting):
-            await close_redis_cache_pool()
+            await close_redis_relate_pool()
 
     return lifespan
 

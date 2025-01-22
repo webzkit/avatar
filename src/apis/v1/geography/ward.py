@@ -18,15 +18,18 @@ from core.paginated import (
     PaginatedListResponse,
     SingleResponse,
 )
-from core.helpers.cache import get_service_related
+from core.caches.relate import get_service_related
 from config import settings
 
 
 router = APIRouter()
 
-URL_OWNER_SERVICE = settings.ENGINE_SERVICE_URL
-PATH_OWNER_SERVICE = settings.OWNER_ENGINE_SERVICE_URL
-KEY_PREFIX_OWNER_SERVICE = "users:result"
+
+API_GATEWAY_SERVICE_URL = settings.API_GATEWAY_SERVICE_URL
+OWNER_PATH = settings.OWNER_PATH
+OWNER_SCHEMA = settings.OWNER_SCHEMA
+OWNER_RELATE_KEY = "created_by"
+OWNER_PREFIX_KEY = "users:result"
 
 
 @router.get(
@@ -52,12 +55,13 @@ async def gets(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
 @get_service_related(
-    key_prefix="users:result",
     related=[
         {
-            "service_host": URL_OWNER_SERVICE,
-            "service_path": PATH_OWNER_SERVICE,
-            "key_prefix": KEY_PREFIX_OWNER_SERVICE,
+            "service_host": API_GATEWAY_SERVICE_URL,
+            "service_path": OWNER_PATH,
+            "key_relate": OWNER_RELATE_KEY,
+            "key_prefix": OWNER_PREFIX_KEY,
+            "key_schema": OWNER_SCHEMA,
         }
     ],
 )

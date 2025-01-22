@@ -58,9 +58,10 @@ class RedisCacheSetting(BaseSettings):
 
 
 class ServiceSetting(BaseSettings):
-    ENGINE_SERVICE_URL: str = getenv("ENGINE_SERVICE_URL", "")
-    OWNER_ENGINE_SERVICE_URL: str = getenv("/api/v1/users/", "")
     HTTP_TIMEOUT_SERVICE: int = int(getenv("HTTP_TIMEOUT_SERVICE", 59))
+    API_GATEWAY_SERVICE_URL: str = getenv("API_GATEWAY_SERVICE_URL", "")
+    OWNER_PATH: str = getenv("OWNER_PATH", "/api/v1/users/")
+    OWNER_SCHEMA: str = getenv("OWNER_SCHEMA", "owner")
 
 
 class Settings(AppSetting, PostgresSetting, RedisCacheSetting, ServiceSetting):

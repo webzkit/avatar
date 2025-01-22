@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.types import Message
 import json
-from core.helpers.utils import parse_query_str
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from core.helpers.utils import parse_query_str
 
 
 class MakeCreatedByMiddleware(BaseHTTPMiddleware):
