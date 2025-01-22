@@ -1,13 +1,12 @@
 from typing import Any, Dict
 import aiohttp
 import async_timeout
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 from config import settings
 from core.exceptions.http_exception import ServiceHttpException
 
 
 async def call_to_service(
-    request: Request,
     url: str,
     method: str = "GET",
     payload: Dict = {},

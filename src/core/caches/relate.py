@@ -15,7 +15,32 @@ pool: ConnectionPool | None = None
 client: Redis | None = None
 
 
-def get_service_related(related: Optional[List[dict]] = None) -> Callable:
+def get_service_relates(related: Optional[List[dict]] = None) -> Callable:
+    def wrapper(func: Callable) -> Callable:
+        @functools.wraps(func)
+        async def inner(request: Request, *args: Any, **kwargs: Any) -> Response:
+
+            result = await func(request, *args, **kwargs)
+
+            if not related:
+                return result
+
+            if request.method == "GET":
+                for relate in related:
+                    for index, item in enumerate(result["data"]):
+                        result_cache = await get_relate(relate, item, request)
+                        if result_cache:
+                            result["data"][index][
+                                await get_key_relate_schema(relate)
+                            ] = result_cache["data"]
+            return result
+
+        return inner
+
+    return wrapper
+
+
+def get_service_relate(related: Optional[List[dict]] = None) -> Callable:
     def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
         async def inner(request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -49,19 +74,20 @@ async def get_relate(relate: Any, data: Any, request: Request) -> Any:
     if result_cache:
         return json.loads(result_cache.decode())
 
-    resp_data, status_code_from_service = await call_to_service(
-        request=request,
-        url=await get_uri_key(relate, data),
-        method=request.method,
-        payload={},
-        service_headers=request.headers,
-        request_param={},
-    )
+    try:
+        resp_data, status_code_from_service = await call_to_service(
+            url=await get_uri_key(relate, data),
+            method=request.method,
+            payload={},
+            service_headers=request.headers,
+            request_param={},
+        )
 
-    if status_code_from_service == status.HTTP_200_OK:
-        return resp_data
+        if status_code_from_service == status.HTTP_200_OK:
+            return resp_data
 
-    return
+    except Exception:
+        return
 
 
 async def get_key_relate_schema(relate: Any):

@@ -18,18 +18,20 @@ from core.paginated import (
     PaginatedListResponse,
     SingleResponse,
 )
-from core.caches.relate import get_service_related
+from core.caches.relate import get_service_relate, get_service_relates
 from config import settings
 
 
 router = APIRouter()
 
 
-API_GATEWAY_SERVICE_URL = settings.API_GATEWAY_SERVICE_URL
-OWNER_PATH = settings.OWNER_PATH
-OWNER_SCHEMA = settings.OWNER_SCHEMA
-OWNER_RELATE_KEY = "created_by"
-OWNER_PREFIX_KEY = "users:result"
+OWNER_RELATE = {
+    "service_host": settings.API_GATEWAY_SERVICE_URL,
+    "service_path": settings.OWNER_PATH,
+    "key_schema": settings.OWNER_SCHEMA,
+    "key_relate": "created_by",
+    "key_prefix": "user:result",
+}
 
 
 @router.get(
@@ -37,7 +39,9 @@ OWNER_PREFIX_KEY = "users:result"
     response_model=PaginatedListResponse[Read],
     status_code=status.HTTP_200_OK,
 )
+@get_service_relates(related=[OWNER_RELATE])
 async def gets(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     page: int = 1,
     items_per_page: int = 100,
@@ -54,17 +58,7 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
-@get_service_related(
-    related=[
-        {
-            "service_host": API_GATEWAY_SERVICE_URL,
-            "service_path": OWNER_PATH,
-            "key_relate": OWNER_RELATE_KEY,
-            "key_prefix": OWNER_PREFIX_KEY,
-            "key_schema": OWNER_SCHEMA,
-        }
-    ],
-)
+@get_service_relate(related=[OWNER_RELATE])
 async def get(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
