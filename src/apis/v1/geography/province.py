@@ -19,6 +19,9 @@ from core.paginated import (
     PaginatedListResponse,
     SingleResponse,
 )
+from core.caches.relate import get_service_relate, get_service_relates
+from core.caches.define import OWNER_RELATE
+
 
 router = APIRouter()
 
@@ -28,7 +31,9 @@ router = APIRouter()
     response_model=PaginatedListResponse[Read],
     status_code=status.HTTP_200_OK,
 )
+@get_service_relates(related=[OWNER_RELATE])
 async def gets(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     page: int = 1,
     items_per_page: int = 100,
@@ -51,7 +56,9 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
+@get_service_relate(related=[OWNER_RELATE])
 async def get(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:

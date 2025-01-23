@@ -1,10 +1,14 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.geography.district import district_geography_curd as crud
+from crud.geography.district import (
+    district_geography_curd as crud,
+    get_multi,
+    get_by_id,
+)
 from core import message
 from fastapi.responses import JSONResponse
-from core.paginated import PaginatedListResponse, compute_offset, paginated_response
+from core.paginated import PaginatedListResponse, paginated_response
 from schemas.geography.district import (
     DistrictGeographyRead as Read,
     DistrictGeographyCreate as Create,
@@ -12,18 +16,14 @@ from schemas.geography.district import (
     DistrictGepgraphyUpdate as Update,
     DistrictGeographyUpdateInternal as UpdateInternal,
 )
-from models.geography.province import ProvinceGeographyModel as JoinModel
-
 from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
-    compute_offset,
     PaginatedListResponse,
     SingleResponse,
 )
-from schemas.geography.province import ProvinceGeographyRelationship
-
-JOIN_PREFIX = "province_"
+from core.caches.relate import get_service_relates, get_service_relate
+from core.caches.define import OWNER_RELATE
 
 router = APIRouter()
 
@@ -33,22 +33,14 @@ router = APIRouter()
     response_model=PaginatedListResponse[Read],
     status_code=status.HTTP_200_OK,
 )
+@get_service_relates(related=[OWNER_RELATE])
 async def gets(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     page: int = 1,
     items_per_page: int = 100,
 ) -> Any:
-    results = await crud.get_multi_joined(
-        db=db,
-        offset=compute_offset(page, items_per_page),
-        limit=items_per_page,
-        schema_to_select=Read,
-        join_model=JoinModel,  # pyright: ignore
-        join_prefix=JOIN_PREFIX,
-        join_schema_to_select=ProvinceGeographyRelationship,
-        is_deleted=False,
-        nest_joins=True,
-    )
+    results = await get_multi(db=db, page=page, items_per_page=items_per_page)
 
     response: dict[str, Any] = paginated_response(
         crud_data=results, page=page, items_per_page=items_per_page
@@ -60,20 +52,13 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[Read], status_code=status.HTTP_200_OK
 )
+@get_service_relate(related=[OWNER_RELATE])
 async def get(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
-    result = await crud.get_joined(
-        db=db,
-        schema_to_select=Read,
-        id=id,
-        is_deleted=False,
-        join_model=JoinModel,  # pyright: ignore
-        join_prefix=JOIN_PREFIX,
-        join_schema_to_select=ProvinceGeographyRelationship,
-        nest_joins=True,
-    )
+    result = await get_by_id(db=db, id=id)
 
     if not result:
         raise HTTPException(

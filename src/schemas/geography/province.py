@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Annotated, Optional
 from pydantic import BaseModel, ConfigDict, Field
 from db.schemas import TimestampSchema, PersistentDeletion
+from schemas.owner import UserRelationship
 
 
 class ProvinceGeographyBase(BaseModel):
@@ -15,6 +16,9 @@ class ProvinceGeography(TimestampSchema, PersistentDeletion, ProvinceGeographyBa
 class ProvinceGeographyRead(ProvinceGeographyBase):
     id: int
     created_at: datetime
+    created_by: int
+
+    owner: Optional[UserRelationship] = None
 
 
 class ProvinceGeographyRelationship(BaseModel):

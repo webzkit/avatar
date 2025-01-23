@@ -19,19 +19,9 @@ from core.paginated import (
     SingleResponse,
 )
 from core.caches.relate import get_service_relate, get_service_relates
-from config import settings
-
+from core.caches.define import OWNER_RELATE
 
 router = APIRouter()
-
-
-OWNER_RELATE = {
-    "service_host": settings.API_GATEWAY_SERVICE_URL,
-    "service_path": settings.OWNER_PATH,
-    "key_schema": settings.OWNER_SCHEMA,
-    "key_relate": "created_by",
-    "key_prefix": "user:result",
-}
 
 
 @router.get(
