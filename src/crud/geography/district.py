@@ -3,7 +3,7 @@ from fastcrud import FastCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.geography.district import (
     DistrictGeographyCreateInternal,
-    DistrictGepgraphyUpdate,
+    DistrictGeographyUpdate,
     DistrictGeographyUpdateInternal,
     DistrictGeographyDelete,
     DistrictGeographyRead as Read,
@@ -15,7 +15,7 @@ from models.geography.province import ProvinceGeographyModel as JoinModel
 DistrictCRUD = FastCRUD[
     DistrictGeographyModel,
     DistrictGeographyCreateInternal,
-    DistrictGepgraphyUpdate,
+    DistrictGeographyUpdate,
     DistrictGeographyUpdateInternal,
     DistrictGeographyDelete,
 ]

@@ -2,7 +2,7 @@ from fastcrud import FastCRUD, JoinConfig
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.geography.ward import (
     WardGeographyCreateInternal,
-    WardGepgraphyUpdate,
+    WardGeographyUpdate,
     WardGeographyUpdateInternal,
     WardGeographyDelete,
 )
@@ -21,7 +21,7 @@ from core.paginated import compute_offset
 WardCRUD = FastCRUD[
     WardGeographyModel,
     WardGeographyCreateInternal,
-    WardGepgraphyUpdate,
+    WardGeographyUpdate,
     WardGeographyUpdateInternal,
     WardGeographyDelete,
 ]

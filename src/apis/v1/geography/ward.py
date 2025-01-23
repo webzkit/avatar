@@ -9,7 +9,7 @@ from schemas.geography.ward import (
     WardGeographyRead as Read,
     WardGeographyCreate as Create,
     WardGeographyCreateInternal as CreateInternal,
-    WardGepgraphyUpdate as Update,
+    WardGeographyUpdate as Update,
     WardGeographyUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db

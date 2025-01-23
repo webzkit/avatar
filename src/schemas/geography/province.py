@@ -35,11 +35,11 @@ class ProvinceGeographyCreateInternal(ProvinceGeographyBase):
     created_by: int
 
 
-class ProvinceGepgraphyUpdate(BaseModel):
+class ProvinceGeographyUpdate(BaseModel):
     name: str | None = None
 
 
-class ProvinceGeographyUpdateInternal(ProvinceGepgraphyUpdate):
+class ProvinceGeographyUpdateInternal(ProvinceGeographyUpdate):
     updated_by: Optional[int] = None
 
 

@@ -9,7 +9,7 @@ from schemas.geography.province import (
     ProvinceGeographyRead as Read,
     ProvinceGeographyCreate as Create,
     ProvinceGeographyCreateInternal as CreateInternal,
-    ProvinceGepgraphyUpdate as Update,
+    ProvinceGeographyUpdate as Update,
     ProvinceGeographyUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db

@@ -39,11 +39,11 @@ class DistrictGeographyCreateInternal(DistrictGeographyBase):
     created_by: int
 
 
-class DistrictGepgraphyUpdate(BaseModel):
+class DistrictGeographyUpdate(BaseModel):
     name: str | None = None
 
 
-class DistrictGeographyUpdateInternal(DistrictGepgraphyUpdate):
+class DistrictGeographyUpdateInternal(DistrictGeographyUpdate):
     updated_by: Optional[int] = None
 
 

@@ -13,7 +13,7 @@ from schemas.geography.district import (
     DistrictGeographyRead as Read,
     DistrictGeographyCreate as Create,
     DistrictGeographyCreateInternal as CreateInternal,
-    DistrictGepgraphyUpdate as Update,
+    DistrictGeographyUpdate as Update,
     DistrictGeographyUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db

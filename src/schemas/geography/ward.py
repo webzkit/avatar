@@ -35,11 +35,11 @@ class WardGeographyCreateInternal(WardGeographyBase):
     created_by: int
 
 
-class WardGepgraphyUpdate(BaseModel):
+class WardGeographyUpdate(BaseModel):
     name: str | None = None
 
 
-class WardGeographyUpdateInternal(WardGepgraphyUpdate):
+class WardGeographyUpdateInternal(WardGeographyUpdate):
     updated_by: Optional[int] = None
 
 
