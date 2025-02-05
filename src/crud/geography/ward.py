@@ -26,7 +26,7 @@ WardCRUD = FastCRUD[
     WardGeographyDelete,
 ]
 
-ward_geography_curd = WardCRUD(WardGeographyModel)
+crud = WardCRUD(WardGeographyModel)
 
 
 JOIN_PREFIX = "district_"
@@ -34,7 +34,7 @@ JOIN_PREFIX_SECOND = "province_"
 
 
 async def get_multi(db: AsyncSession, page: int = 1, items_per_page: int = 100):
-    return await ward_geography_curd.get_multi_joined(
+    return await crud.get_multi_joined(
         db=db,
         offset=compute_offset(page, items_per_page),
         limit=items_per_page,
@@ -61,7 +61,7 @@ async def get_multi(db: AsyncSession, page: int = 1, items_per_page: int = 100):
 
 
 async def get_by_id(db: AsyncSession, id: int):
-    return await ward_geography_curd.get_joined(
+    return await crud.get_joined(
         db=db,
         schema_to_select=Read,
         id=id,

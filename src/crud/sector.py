@@ -11,4 +11,4 @@ SectorCRUD = FastCRUD[
     SectorModel, SectorCreateInternal, SectorUpdate, SectorUpdateInternal, SectorDelete
 ]
 
-sector_curd = SectorCRUD(SectorModel)
+crud = SectorCRUD(SectorModel)

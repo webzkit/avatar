@@ -21,13 +21,13 @@ DistrictCRUD = FastCRUD[
 ]
 from core.paginated import compute_offset
 
-district_geography_curd = DistrictCRUD(DistrictGeographyModel)
+crud = DistrictCRUD(DistrictGeographyModel)
 
 JOIN_PREFIX = "province_"
 
 
 async def get_multi(db: AsyncSession, page: int = 1, items_per_page: int = 100) -> Any:
-    return await district_geography_curd.get_multi_joined(
+    return await crud.get_multi_joined(
         db=db,
         offset=compute_offset(page, items_per_page),
         limit=items_per_page,
@@ -41,7 +41,7 @@ async def get_multi(db: AsyncSession, page: int = 1, items_per_page: int = 100) 
 
 
 async def get_by_id(db: AsyncSession, id: int) -> Any:
-    return await district_geography_curd.get_joined(
+    return await crud.get_joined(
         db=db,
         schema_to_select=Read,
         id=id,

@@ -1,7 +1,7 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.geography.country import country_geography_curd as crud
+from crud.geography.country import crud
 from core import message
 from fastapi.responses import JSONResponse
 from schemas.geography.country import (

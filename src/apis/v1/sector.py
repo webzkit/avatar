@@ -1,7 +1,7 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.sector import sector_curd as crud
+from crud.sector import crud
 from core import message
 from fastapi.responses import JSONResponse
 from core.paginated import PaginatedListResponse, compute_offset, paginated_response

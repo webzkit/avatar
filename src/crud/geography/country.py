@@ -15,4 +15,4 @@ CountryCRUD = FastCRUD[
     CountryGeographyDelete,
 ]
 
-country_geography_curd = CountryCRUD(CountryGeographyModel)
+crud = CountryCRUD(CountryGeographyModel)

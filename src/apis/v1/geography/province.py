@@ -2,7 +2,7 @@ from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from crud.geography.province import (
-    province_geography_curd as crud,
+    crud,
     get_multi,
     get_by_id,
 )
