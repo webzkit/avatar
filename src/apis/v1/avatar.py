@@ -1,16 +1,16 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.sector import sector_curd as crud
+from crud.avatar import crud
 from core import message
 from fastapi.responses import JSONResponse
 from core.paginated import PaginatedListResponse, compute_offset, paginated_response
-from schemas.sector import (
-    SectorRead as Read,
-    SectorCreate as Create,
-    SectorCreateInternal as CreateInternal,
-    SectorUpdate as Update,
-    SectorUpdateInternal as UpdateInternal,
+from schemas.avatar import (
+    AvatarRead as Read,
+    AvatarCreate as Create,
+    AvatarCreateInternal as CreateInternal,
+    AvatarUpdate as Update,
+    AvatarUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db
 from core.paginated import (
@@ -78,15 +78,15 @@ async def create(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     data_request: Create,
 ) -> Response:
-    exists = await crud.exists(db=db, name=data_request.name)
-    if exists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
-        )
-
+    if data_request.email:
+        exists = await crud.exists(db=db, email=data_request.email)
+        if exists:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
+            )
     data_internal = CreateInternal(**await request.json())
-
     await crud.create(db=db, object=data_internal)
+
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.CREATE_SUCCEED}
     )
@@ -105,6 +105,13 @@ async def update(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
+
+    if data_request.email:
+        has_email = await crud.exists(db=db, email=data_request.email)
+        if has_email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
+            )
 
     data_internal = UpdateInternal(**await request.json())
     await crud.update(db=db, object=data_internal, id=id)

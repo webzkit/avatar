@@ -1,16 +1,11 @@
 from datetime import datetime
 from typing import Annotated, Optional
 from pydantic import BaseModel, ConfigDict, Field
-from db.schemas import TimestampSchema, PersistentDeletion
 from schemas.owner import UserRelationship
 
 
 class SectorBase(BaseModel):
     name: Annotated[str, Field(examples=["Social"])]
-
-
-class Sector(TimestampSchema, PersistentDeletion, SectorBase):
-    pass
 
 
 class SectorRead(SectorBase):
