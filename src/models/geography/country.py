@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String
 from db.database import Base
 from db.models import TimestampMixin, SoftDeleteMixin, OwnerMixin
 
 
-class ProvinceGeographyModel(OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
-    __tablename__ = "geography_provinces"
+class CountryGeographyModel(OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
+    __tablename__ = "geography_countries"
 
     id: Mapped[int] = mapped_column(
         "id",
@@ -17,8 +17,4 @@ class ProvinceGeographyModel(OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
     )
 
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    region_code: Mapped[str] = mapped_column(String(5), nullable=True)
-
-    geography_country_id: Mapped[int] = mapped_column(
-        ForeignKey("geography_countries.id"), index=True, default=1
-    )
+    region_code: Mapped[str] = mapped_column(String(2), nullable=True)

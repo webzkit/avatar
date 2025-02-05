@@ -8,7 +8,6 @@ from crud.geography.district import (
 )
 from core import message
 from fastapi.responses import JSONResponse
-from core.paginated import PaginatedListResponse, paginated_response
 from schemas.geography.district import (
     DistrictGeographyRead as Read,
     DistrictGeographyCreate as Create,

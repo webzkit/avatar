@@ -1,8 +1,12 @@
 from fastapi import APIRouter
-from .v1.geography import province, district, ward
+from .v1.geography import province, district, ward, country
 from .v1 import sector
 
 api_router = APIRouter()
+
+api_router.include_router(
+    country.router, prefix="/geographies/countries", tags=["Geograpphy Country"]
+)
 
 api_router.include_router(
     province.router, prefix="/geographies/provinces", tags=["Geograpphy Province"]

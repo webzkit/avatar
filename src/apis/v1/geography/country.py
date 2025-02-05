@@ -1,23 +1,20 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.geography.province import (
-    province_geography_curd as crud,
-    get_multi,
-    get_by_id,
-)
+from crud.geography.country import country_geography_curd as crud
 from core import message
 from fastapi.responses import JSONResponse
-from schemas.geography.province import (
-    ProvinceGeographyRead as Read,
-    ProvinceGeographyCreate as Create,
-    ProvinceGeographyCreateInternal as CreateInternal,
-    ProvinceGeographyUpdate as Update,
-    ProvinceGeographyUpdateInternal as UpdateInternal,
+from schemas.geography.country import (
+    CountryGeographyRead as Read,
+    CountryGeographyCreate as Create,
+    CountryGeographyCreateInternal as CreateInternal,
+    CountryGeographyUpdate as Update,
+    CountryGeographyUpdateInternal as UpdateInternal,
 )
 from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
+    compute_offset,
     PaginatedListResponse,
     SingleResponse,
 )
@@ -40,10 +37,16 @@ async def gets(
     page: int = 1,
     items_per_page: int = 100,
 ) -> Any:
-    results = await get_multi(db=db, page=page, items_per_page=items_per_page)
+    users_data = await crud.get_multi(
+        db=db,
+        offset=compute_offset(page, items_per_page),
+        limit=items_per_page,
+        schema_to_select=Read,
+        is_deleted=False,
+    )
 
     response: dict[str, Any] = paginated_response(
-        crud_data=results, page=page, items_per_page=items_per_page
+        crud_data=users_data, page=page, items_per_page=items_per_page
     )
 
     return response
@@ -58,7 +61,7 @@ async def get(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
-    result = await get_by_id(db=db, id=id)
+    result = await crud.get(db=db, schema_to_select=Read, id=id, is_deleted=False)
 
     if not result:
         raise HTTPException(

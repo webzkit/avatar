@@ -18,5 +18,5 @@ class AvatarModel(UUIDMixin, OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
     email: Mapped[str] = mapped_column(String(50), nullable=True)
     phone: Mapped[str] = mapped_column(String(15), nullable=True)
     firstname: Mapped[str] = mapped_column(String(50), nullable=False)
-    lasttname: Mapped[str] = mapped_column(String(50), nullable=False)
+    lastname: Mapped[str] = mapped_column(String(50), nullable=False)
     is_kol: Mapped[bool] = mapped_column(Boolean, default=False)
