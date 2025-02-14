@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Any, List, Optional
 from pydantic import BaseModel, EmailStr, Field
 from schemas.owner import UserRelationship
 
@@ -23,7 +23,7 @@ class AvatarRead(AvatarBase):
 
 
 class AvatarCreate(AvatarBase):
-    pass
+    sectors: Annotated[List[Any], Field(default=[1])]
 
 
 class AvatarCreateInternal(AvatarBase):
