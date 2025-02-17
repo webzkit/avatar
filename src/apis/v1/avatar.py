@@ -1,8 +1,8 @@
-from typing import Annotated, Any, List, Union
+from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from crud.avatar import crud
-from crud.avatar_sector import crud as avatar_sector_crud
+from crud.avatar_sector import updateOrCreate
 from core import message
 from fastapi.responses import JSONResponse
 from core.paginated import PaginatedListResponse, compute_offset, paginated_response
@@ -86,16 +86,16 @@ async def create(
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
             )
+
     data_internal = CreateInternal(**await request.json())
     result = await crud.create(db=db, object=data_internal)
 
     sector_ids = data_request.model_dump().get("sectors")
-    if sector_ids:
-        for item in sector_ids:
-            data_avatar_sector = AvatarSectorCreateInternal(
-                sector_id=item, avatar_id=result.id
-            )
-            await avatar_sector_crud.create(db=db, object=data_avatar_sector)
+    data_avatar_sector = AvatarSectorCreateInternal(
+        sectors=sector_ids, avatar=result.id
+    )
+
+    await updateOrCreate(db=db, objects=data_avatar_sector.data, id_deleted=result.id)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.CREATE_SUCCEED}
