@@ -2,7 +2,7 @@ from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from crud.avatar import crud
-from crud.avatar_sector import updateOrCreate
+from crud.avatar_sector import deleteOrCreated
 from core import message
 from fastapi.responses import JSONResponse
 from core.paginated import PaginatedListResponse, compute_offset, paginated_response
@@ -13,7 +13,7 @@ from schemas.avatar import (
     AvatarUpdate as Update,
     AvatarUpdateInternal as UpdateInternal,
 )
-from schemas.avatar_sector import AvatarSectorCreateInternal
+from schemas.avatar_sector import AvatarSectors, AvatarSectorCreateInternal
 from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
@@ -88,14 +88,18 @@ async def create(
             )
 
     data_internal = CreateInternal(**await request.json())
-    result = await crud.create(db=db, object=data_internal)
+    try:
+        result = await crud.create(db=db, object=data_internal)
 
-    sector_ids = data_request.model_dump().get("sectors")
-    data_avatar_sector = AvatarSectorCreateInternal(
-        sectors=sector_ids, avatar=result.id
-    )
+        data_avatar_sectors = AvatarSectors(
+            sectors=data_request.model_dump().get("sectors"), avatar_id=result.id
+        )
 
-    await updateOrCreate(db=db, objects=data_avatar_sector.data, id_deleted=result.id)
+        await deleteOrCreated(db=db, object=data_avatar_sectors)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=message.CREATE_FAILED
+        )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.CREATE_SUCCEED}

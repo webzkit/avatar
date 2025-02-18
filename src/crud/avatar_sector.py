@@ -7,7 +7,7 @@ from schemas.avatar_sector import (
     AvatarSectorUpdate,
     AvatarSectorUpdateInternal,
     AvatarSectorDelete,
-    AvatarSectorBase,
+    AvatarSectors,
 )
 from models.avatar_sector import AvatarSectorModel
 
@@ -21,25 +21,30 @@ CRUD = FastCRUD[
 ]
 
 crud = CRUD(AvatarSectorModel)
+model = crud.model
 
 
-async def updateOrCreate(db: AsyncSession, objects: Any, id_deleted: int) -> Any:
-    create_data: List[AvatarSectorBase] = []
-    if not objects:
+async def deleteOrCreated(db: AsyncSession, object: AvatarSectors) -> Any:
+    create_data: List[model] = []
+    if not object.sectors:
         return
 
     try:
-        stm = delete(AvatarSectorModel).where(AvatarSectorModel.avatar_id == id_deleted)
+        stm = delete(model).where(model.avatar_id == object.avatar_id)
         await db.execute(stm)
 
-        for object in objects:
-            db_object: Any = crud.model(**object)
+        for sector in object.sectors:
+            obj = AvatarSectorCreateInternal(
+                avatar_id=object.avatar_id, sector_id=sector
+            ).model_dump()
+
+            # init
+            db_object: model = crud.model(**obj)
             create_data.append(db_object)
 
         db.add_all(create_data)
         await db.commit()
     except:
-        print("erro")
         await db.rollback()
     finally:
         await db.close()

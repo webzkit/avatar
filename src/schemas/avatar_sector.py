@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated, Any, List, Optional
 from pydantic import BaseModel, EmailStr, Field, computed_field
 
@@ -8,16 +7,16 @@ class AvatarSectorBase(BaseModel):
     sector_id: int
 
 
-class AvatarSectorCreateInternal(BaseModel):
-    avatar: int
+class AvatarSectors(BaseModel):
+    avatar_id: int
     sectors: Any
 
     @computed_field
     @property
-    def data(self) -> Any:
+    def data(self) -> List[AvatarSectorBase]:
         sectors = []
         for sector in self.sectors:
-            sectors.append({"avatar_id": self.avatar, "sector_id": sector})
+            sectors.append({"avatar_id": self.avatar_id, "sector_id": sector})
 
         return sectors
 
@@ -27,6 +26,10 @@ class AvatarSectorRead(AvatarSectorBase):
 
 
 class AvatarSectorCreate(AvatarSectorBase):
+    pass
+
+
+class AvatarSectorCreateInternal(AvatarSectorBase):
     pass
 
 
