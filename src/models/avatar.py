@@ -1,7 +1,9 @@
 from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 from db.models import OwnerMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from models.avatar_sector import AvatarSectorModel
+from models.sector import SectorModel
 
 
 class AvatarModel(UUIDMixin, OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -20,3 +22,5 @@ class AvatarModel(UUIDMixin, OwnerMixin, TimestampMixin, SoftDeleteMixin, Base):
     firstname: Mapped[str] = mapped_column(String(50), nullable=False)
     lastname: Mapped[str] = mapped_column(String(50), nullable=False)
     is_kol: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # sectors = relationship(SectorModel, secondary="avatar_sectors")

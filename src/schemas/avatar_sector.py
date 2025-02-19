@@ -1,5 +1,5 @@
-from typing import Annotated, Any, List, Optional
-from pydantic import BaseModel, EmailStr, Field, computed_field
+from typing import Any, List
+from pydantic import BaseModel, computed_field
 
 
 class AvatarSectorBase(BaseModel):

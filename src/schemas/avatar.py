@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Annotated, Any, List, Optional
 from pydantic import BaseModel, EmailStr, Field
 from schemas.owner import UserRelationship
+from schemas.sector import SectorRelationship
 
 
 class AvatarBase(BaseModel):
@@ -20,6 +21,7 @@ class AvatarRead(AvatarBase):
     created_by: int
 
     owner: Optional[UserRelationship] = None
+    sectors: List[SectorRelationship]
 
 
 class AvatarCreate(AvatarBase):
