@@ -18,7 +18,7 @@ class SectorRead(SectorBase):
 
 class SectorRelationship(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
+    id: int
     name: Optional[str] = None
 
 

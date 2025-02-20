@@ -16,9 +16,9 @@ class AvatarSectorModel(Base):
     )
 
     avatar_id: Mapped[int] = mapped_column(
-        ForeignKey("avatars.id"), index=True, default=1
+        ForeignKey("avatars.id"), index=True, primary_key=True
     )
 
     sector_id: Mapped[int] = mapped_column(
-        ForeignKey("sectors.id"), index=True, default=1
+        ForeignKey("sectors.id"), index=True, primary_key=True
     )

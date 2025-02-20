@@ -1,11 +1,11 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from crud.avatar import crud, get_by_id
+from crud.avatar import crud, get_by_id, get_multi
 from crud.avatar_sector import deleteOrCreated
 from core import message
 from fastapi.responses import JSONResponse
-from core.paginated import PaginatedListResponse, compute_offset, paginated_response
+from core.paginated import PaginatedListResponse, paginated_response
 from schemas.avatar import (
     AvatarRead as Read,
     AvatarCreate as Create,
@@ -17,7 +17,6 @@ from schemas.avatar_sector import AvatarSectors
 from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
-    compute_offset,
     PaginatedListResponse,
     SingleResponse,
 )
@@ -40,12 +39,10 @@ async def gets(
     page: int = 1,
     items_per_page: int = 100,
 ) -> Any:
-    results = await crud.get_multi(
+    results = await get_multi(
         db=db,
-        offset=compute_offset(page, items_per_page),
-        limit=items_per_page,
-        schema_to_select=Read,
-        is_deleted=False,
+        page=page,
+        items_per_page=items_per_page,
     )
 
     response: dict[str, Any] = paginated_response(
@@ -64,7 +61,6 @@ async def get(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
-    # result = await crud.get(db=db, schema_to_select=Read, id=id, is_deleted=False)
     result = await get_by_id(db=db, id=id)
 
     if not result:
@@ -122,14 +118,15 @@ async def update(
         )
 
     if data_request.email:
-        has_email = await crud.exists(db=db, email=data_request.email)
+        has_email = await crud.exists(db=db, email=data_request.email, id__notlike=id)
         if has_email:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail=message.ITEM_ALREADY_EXISTS
             )
 
     data_internal = UpdateInternal(**await request.json())
-    await crud.update(db=db, object=data_internal, id=id)
+    result = crud.update(db=db, object=data_internal, id=id)
+    print(result)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
