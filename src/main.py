@@ -5,6 +5,7 @@ from typing import Any, Dict
 from config import settings
 from apis.api import api_router
 from core.setup import create_application
+from core.trace.jaeger import tracing
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
@@ -54,10 +55,22 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 
+@app.get("/check_health")
+@tracing()
+async def check(request: Request) -> Any:
+    result: Dict[Any, Any] = {
+        "status": "Check Healt",
+        "message": f"Your {settings.APP_NAME} endpoint is working",
+    }
+
+    return result
+
+
 @app.get("/health")
 async def root(request: Request) -> Any:
     context = extract(request.headers)
     tracer = trace.get_tracer(__name__)
+    print(tracer)
 
     with tracer.start_as_current_span("process_request", context=context) as span:
         try:
