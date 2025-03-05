@@ -17,9 +17,11 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.propagate import extract
 from opentelemetry.trace.status import Status, StatusCode
-
+import logging
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 
 # Configure tracing with sampling
+"""
 sampler = ParentBasedTraceIdRatio(0.3)
 trace.set_tracer_provider(
     TracerProvider(
@@ -35,13 +37,32 @@ trace.set_tracer_provider(
 )
 jaeger_exporter = JaegerExporter(agent_host_name="jaeger", agent_port=6831)
 trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
+"""
+
+resource = Resource(attributes={"service.name": "fastapi-service"})
+tracer_provider = TracerProvider(resource=resource)
+trace.set_tracer_provider(tracer_provider)
+# Set up OTLP exporter for traces
+otlp_exporter = OTLPSpanExporter(endpoint="otel-collector:4317", insecure=True)
+span_processor = BatchSpanProcessor(otlp_exporter)
+tracer_provider.add_span_processor(span_processor)
+# Set up logging
+logging.basicConfig(
+    filename="app.log",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    level=logging.DEBUG,
+)
+logger = logging.getLogger(__name__)
+
 
 # Init application
 app = create_application(router=api_router, settings=settings)
 
+# FastAPIInstrumentor.instrument_app(app)
+# RequestsInstrumentor().instrument()
 FastAPIInstrumentor.instrument_app(app)
-RequestsInstrumentor().instrument()
-
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
@@ -56,8 +77,9 @@ if settings.BACKEND_CORS_ORIGINS:
 
 
 @app.get("/check_health")
-@tracing()
+# @tracing()
 async def check(request: Request) -> Any:
+    logger.info("Root endpoint accessed")
     result: Dict[Any, Any] = {
         "status": "Check Healt",
         "message": f"Your {settings.APP_NAME} endpoint is working",
@@ -66,6 +88,7 @@ async def check(request: Request) -> Any:
     return result
 
 
+"""
 @app.get("/health")
 async def root(request: Request) -> Any:
     context = extract(request.headers)
@@ -90,3 +113,4 @@ async def root(request: Request) -> Any:
             span.set_status(Status(StatusCode.ERROR))
             span.record_exception(e)
             raise HTTPException(status_code=500, detail="Internal Server Error")
+"""
