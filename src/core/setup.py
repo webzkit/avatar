@@ -10,6 +10,7 @@ from .caches import relate
 
 from config import (
     EnviromentOption,
+    RegisterServiceSetting,
     settings,
     AppSetting,
     RedisCacheSetting,
@@ -18,6 +19,7 @@ from config import (
 )
 
 from middlewares.set_created_by import MakeCreatedByMiddleware
+from core.consul.registry_service import register_service
 
 
 # Cache Relate
@@ -31,7 +33,13 @@ async def close_redis_relate_pool() -> None:
 
 
 def lifespan_factory(
-    settings: AppSetting | RedisCacheSetting | PostgresSetting | ServiceSetting,
+    settings: (
+        AppSetting
+        | RedisCacheSetting
+        | PostgresSetting
+        | ServiceSetting
+        | RegisterServiceSetting
+    ),
 ) -> Callable[[FastAPI], _AsyncGeneratorContextManager[Any]]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
@@ -41,6 +49,9 @@ def lifespan_factory(
 
         if isinstance(settings, RedisCacheSetting):
             await close_redis_relate_pool()
+
+        if isinstance(settings, RegisterServiceSetting):
+            await register_service()
 
     return lifespan
 

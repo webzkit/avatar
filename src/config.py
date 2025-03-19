@@ -64,7 +64,23 @@ class ServiceSetting(BaseSettings):
     OWNER_SCHEMA: str = getenv("OWNER_SCHEMA", "owner")
 
 
-class Settings(AppSetting, PostgresSetting, RedisCacheSetting, ServiceSetting):
+class RegisterServiceSetting(BaseSettings):
+    CONSUL_HOST: str = getenv("CONSUL_HOST", "consul")
+    CONSUL_PORT: int = int(getenv("CONSUL_PORT", 8500))
+    CONSUL_INTERVAL: str = getenv("CONSUL_INTERVAL", "10s")
+    CONSUL_TIMEOUT: str = getenv("CONSUL_TIMEOUT", "5s")
+
+    SERVICE_NAME: str = getenv("AVATAR_SERVICE_NAME", "avatar")
+    SERVICE_PORT: int = int(getenv("ENGINE_SERVICE_PORT", 8000))
+
+
+class Settings(
+    AppSetting,
+    PostgresSetting,
+    RedisCacheSetting,
+    ServiceSetting,
+    RegisterServiceSetting,
+):
     model_config = SettingsConfigDict(env_prefix="AVATAR_")
     pass
 
