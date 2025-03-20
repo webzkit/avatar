@@ -1,0 +1,21 @@
+services:
+    avatar:
+        #container_name: zkit_avatar
+        build:
+            context: ./
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+        env_file:
+            - ./../.env
+        deploy:
+            replicas: 1
+        ports:
+            - "8081:8000"
+        volumes:
+            - ./src/:/zkit/
+        networks:
+            - frontend
+        depends_on:
+            - postgres
+        restart: unless-stopped

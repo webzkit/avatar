@@ -17,7 +17,6 @@ class AppSetting(BaseSettings):
     APP_NAME: str = Field(default="AppName")
     APP_API_PREFIX: str = Field(default="/api/v1")
     APP_ENV: Union[EnviromentOption, str] = Field(default="development")
-    APP_PORT: int = Field(default=8000)
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
         "BACKEND_CORS_ORIGINS", []
@@ -37,7 +36,7 @@ class PostgresSetting(BaseSettings):
     POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
     POSTGRES_PORT: int = int(getenv("POSTGRES_PORT", 5432))
-    POSTGRES_DB: str = getenv("AVATAR_APP_DB", "avatars")
+    POSTGRES_DB: str = getenv("AVATAR__APP_DB", "avatars")
     POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
     POSTGRES_ASYNC_PREFIX: str = getenv(
         "POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://"
@@ -59,7 +58,6 @@ class RedisCacheSetting(BaseSettings):
 
 class ServiceSetting(BaseSettings):
     HTTP_TIMEOUT_SERVICE: int = int(getenv("HTTP_TIMEOUT_SERVICE", 59))
-    API_GATEWAY_SERVICE_URL: str = getenv("API_GATEWAY_SERVICE_URL", "")
     OWNER_PATH: str = getenv("OWNER_PATH", "/api/v1/users/")
     OWNER_SCHEMA: str = getenv("OWNER_SCHEMA", "owner")
 
@@ -71,7 +69,8 @@ class RegisterServiceSetting(BaseSettings):
     CONSUL_TIMEOUT: str = getenv("CONSUL_TIMEOUT", "5s")
 
     SERVICE_NAME: str = getenv("AVATAR_SERVICE_NAME", "avatar")
-    SERVICE_PORT: int = int(getenv("ENGINE_SERVICE_PORT", 8000))
+    SERVICE_PORT: int = int(getenv("AVATAl_SERVICE_PORT", 8000))
+    APIGATEWAY_SERVICE_NAME: str = getenv("APIGATEWAY_SERVICE_NAME", "api_gateway")
 
 
 class Settings(
@@ -81,7 +80,7 @@ class Settings(
     ServiceSetting,
     RegisterServiceSetting,
 ):
-    model_config = SettingsConfigDict(env_prefix="AVATAR_")
+    model_config = SettingsConfigDict(env_prefix="AVATAR__")
     pass
 
 
