@@ -56,7 +56,6 @@ class MakeCreatedByMiddleware(BaseHTTPMiddleware):
             try:
                 await self.set_body(request)
             except HTTPException as error:
-                print(error.status_code)
                 return JSONResponse(
                     status_code=error.status_code,
                     content={"detail": error.detail},
