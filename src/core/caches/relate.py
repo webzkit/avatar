@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any, List, Optional
 from fastapi import Request, Response, status
 from redis.asyncio import ConnectionPool, Redis
-
+from core.consul.discover_service import discover_service
 from ..exceptions.cache_exception import (
     MissingClientError,
 )
@@ -96,8 +96,9 @@ async def get_key_relate_schema(relate: Any):
 
 async def get_uri_key(relate: Any, data: Any):
     owner_id = data.get(relate.get("key_relate", None), None)
+    host = discover_service(relate.get("service_name"))
 
-    return f"{relate.get('service_host')}{relate.get('service_path')}{owner_id}"
+    return f"{host}{relate.get('service_path')}{owner_id}"
 
 
 async def get_cache_key(relate: Any, data: Any):

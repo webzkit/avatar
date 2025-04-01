@@ -16,10 +16,10 @@ def discover_service(service_name: str) -> str:
             service = response.json()[0]
 
             return f"http://{service['ServiceAddress']}:{service['ServicePort']}"
-        else:
-            raise HTTPException(
-                status_code=503, detail=f"Service {service_name} not found in Consul"
-            )
+
+        raise HTTPException(
+            status_code=503, detail=f"Service {service_name} not found in Consul"
+        )
     except Exception as e:
         logger.error(f"Error discovering service {service_name}: {e}")
 
