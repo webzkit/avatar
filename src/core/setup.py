@@ -11,16 +11,12 @@ from .caches import relate
 from config import (
     EnviromentOption,
     RegisterServiceSetting,
-    ServiceInternalSetting,
     settings,
     AppSetting,
     RedisCacheSetting,
     PostgresSetting,
-    ServiceInternalSetting,
 )
-
 from middlewares.set_created_by import MakeCreatedByMiddleware
-from core.consul.registry_service import register_service
 
 
 # Cache Relate
@@ -44,9 +40,6 @@ def lifespan_factory(
 
         if isinstance(settings, RedisCacheSetting):
             await close_redis_relate_pool()
-
-        if isinstance(settings, RegisterServiceSetting):
-            await register_service()
 
     return lifespan
 

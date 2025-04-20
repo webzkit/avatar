@@ -5,6 +5,8 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from sqlalchemy import create_engine
 from config import settings
 from sqlalchemy_utils import database_exists, create_database
+from core.consul.registry_service import register_service
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,9 +37,20 @@ async def init() -> None:
     engine.dispose()
 
 
+@retry(
+    stop=stop_after_attempt(max_tries),
+    wait=wait_fixed(wait_seconds),
+    before=before_log(logger, logging.INFO),
+    after=after_log(logger, logging.WARN),
+)
+async def registry() -> None:
+    await register_service()
+
+
 async def main() -> None:
     logger.info("Initializing service")
     await init()
+    await registry()
     logger.info("Service finished initializing")
 
 
