@@ -98,7 +98,7 @@ async def get_uri_key(relate: Any, data: Any):
     owner_id = data.get(relate.get("key_relate", None), None)
     host = discover_service(relate.get("service_name"))
 
-    return f"{host}{relate.get('service_path')}{owner_id}"
+    return f"{host}{relate.get('service_path')}{owner_id}?use_cache=true"
 
 
 async def get_cache_key(relate: Any, data: Any):

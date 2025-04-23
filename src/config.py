@@ -70,7 +70,7 @@ class RegisterServiceSetting(BaseSettings):
     HTTP_TIMEOUT_SERVICE: int = int(getenv("HTTP_TIMEOUT_SERVICE", 59))
     SERVICE_NAME: str = getenv("AVATAR_SERVICE_NAME", "avatar")
     SERVICE_PORT: int = int(getenv("AVATAl_SERVICE_PORT", 8000))
-    APIGATEWAY_SERVICE_NAME: str = getenv("APIGATEWAY_SERVICE_NAME", "api_gateway")
+    ENGINE_SERVICE_NAME: str = getenv("ENGINE_SERVICE_NAME", "engine")
 
 
 class Settings(
