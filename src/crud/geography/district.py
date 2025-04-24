@@ -2,26 +2,15 @@ from typing import Any
 from fastcrud import FastCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.geography.district import (
-    DistrictGeographyCreateInternal,
-    DistrictGeographyUpdate,
-    DistrictGeographyUpdateInternal,
-    DistrictGeographyDelete,
     DistrictGeographyRead as Read,
 )
 from models.geography.district import DistrictGeographyModel
 from schemas.geography.province import ProvinceGeographyRelationship
 from models.geography.province import ProvinceGeographyModel as JoinModel
 
-DistrictCRUD = FastCRUD[
-    DistrictGeographyModel,
-    DistrictGeographyCreateInternal,
-    DistrictGeographyUpdate,
-    DistrictGeographyUpdateInternal,
-    DistrictGeographyDelete,
-]
 from core.paginated import compute_offset
 
-crud = DistrictCRUD(DistrictGeographyModel)
+crud = FastCRUD(DistrictGeographyModel)
 
 JOIN_PREFIX = "province_"
 

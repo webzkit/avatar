@@ -1,11 +1,5 @@
 from fastcrud import FastCRUD, JoinConfig
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.geography.ward import (
-    WardGeographyCreateInternal,
-    WardGeographyUpdate,
-    WardGeographyUpdateInternal,
-    WardGeographyDelete,
-)
 from models.geography.ward import WardGeographyModel
 from schemas.geography.ward import (
     WardGeographyRead as Read,
@@ -18,15 +12,7 @@ from schemas.geography.province import ProvinceGeographyRelationship
 from core.paginated import compute_offset
 
 
-WardCRUD = FastCRUD[
-    WardGeographyModel,
-    WardGeographyCreateInternal,
-    WardGeographyUpdate,
-    WardGeographyUpdateInternal,
-    WardGeographyDelete,
-]
-
-crud = WardCRUD(WardGeographyModel)
+crud = FastCRUD(WardGeographyModel)
 
 
 JOIN_PREFIX = "district_"

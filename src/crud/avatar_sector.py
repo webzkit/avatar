@@ -4,23 +4,12 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.avatar_sector import (
     AvatarSectorCreateInternal,
-    AvatarSectorUpdate,
-    AvatarSectorUpdateInternal,
-    AvatarSectorDelete,
     AvatarSectors,
 )
 from models.avatar_sector import AvatarSectorModel
 
 
-CRUD = FastCRUD[
-    AvatarSectorModel,
-    AvatarSectorCreateInternal,
-    AvatarSectorUpdate,
-    AvatarSectorUpdateInternal,
-    AvatarSectorDelete,
-]
-
-crud = CRUD(AvatarSectorModel)
+crud = FastCRUD(AvatarSectorModel)
 model = crud.model
 
 

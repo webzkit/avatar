@@ -38,6 +38,7 @@ class MakeCreatedByMiddleware(BaseHTTPMiddleware):
 
     async def get_created_by(self, request: Request) -> Response | Any:
         request_init_data = request.headers.get("request-init-data")
+
         if request_init_data is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -60,7 +61,6 @@ class MakeCreatedByMiddleware(BaseHTTPMiddleware):
                     status_code=error.status_code,
                     content={"detail": error.detail},
                 )
-
         response: Response = await call_next(request)
 
         return response

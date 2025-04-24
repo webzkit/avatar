@@ -126,7 +126,6 @@ async def update(
 
     data_internal = UpdateInternal(**await request.json())
     result = crud.update(db=db, object=data_internal, id=id)
-    print(result)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
