@@ -1,6 +1,5 @@
 services:
     avatar:
-        #container_name: zkit_avatar
         build:
             context: ./
             dockerfile: Dockerfile
@@ -15,7 +14,7 @@ services:
         volumes:
             - ./src/:/zkit/
         networks:
-            - frontend
+            - zkit_network
         depends_on:
             - postgres
         restart: unless-stopped
