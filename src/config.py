@@ -67,6 +67,8 @@ class RegisterServiceSetting(BaseSettings):
     CONSUL_INTERVAL: str = getenv("CONSUL_INTERVAL", "10s")
     CONSUL_TIMEOUT: str = getenv("CONSUL_TIMEOUT", "5s")
 
+    OTLP_GRPC_ENDPOINT: str = getenv("OTLP_GRPC_ENDPOINT", "tempo:4317")
+
     HTTP_TIMEOUT_SERVICE: int = int(getenv("HTTP_TIMEOUT_SERVICE", 59))
     SERVICE_NAME: str = getenv("AVATAR_SERVICE_NAME", "avatar")
     SERVICE_PORT: int = int(getenv("AVATAl_SERVICE_PORT", 8000))

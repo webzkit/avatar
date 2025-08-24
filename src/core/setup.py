@@ -17,6 +17,7 @@ from config import (
     PostgresSetting,
 )
 from middlewares.set_created_by import MakeCreatedByMiddleware
+from middlewares.metrics import MetricMiddleware, metrics
 
 
 # Cache Relate
@@ -66,6 +67,10 @@ def create_application(
 
     # Add middleware
     application.add_middleware(MakeCreatedByMiddleware)  # pyright: ignore
+
+    if isinstance(settings, AppSetting):
+        application.add_middleware(MetricMiddleware, app_name=settings.APP_NAME)
+        application.add_route("/metrics", metrics)
 
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.APP_API_PREFIX)
