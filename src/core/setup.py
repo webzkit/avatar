@@ -5,7 +5,7 @@ from redis import asyncio as redis
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
-
+from starlette.middleware.cors import CORSMiddleware
 from .caches import relate
 
 from config import (
@@ -17,7 +17,8 @@ from config import (
     PostgresSetting,
 )
 from middlewares.set_created_by import MakeCreatedByMiddleware
-from middlewares.metrics import MetricMiddleware, metrics
+from middlewares.metrics import MetricMiddleware, metrics, setting_otlp
+from middlewares.log_request import LogRequestMiddleware
 
 
 # Cache Relate
@@ -49,7 +50,7 @@ def lifespan_factory(
 def create_application(
     router: APIRouter,
     settings: AppSetting | RedisCacheSetting | PostgresSetting,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> FastAPI:
     if isinstance(settings, AppSetting):
         to_update = {
@@ -66,11 +67,33 @@ def create_application(
     application = FastAPI(lifespan=lifespan, **kwargs)
 
     # Add middleware
+    # Set all CORS enabled origins
+
+    if settings.BACKEND_CORS_ORIGINS:
+        application.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            # allow_origins=[str(origin)
+            #               for origin in settings.BACKEND_CORS_ORIGINS],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
     application.add_middleware(MakeCreatedByMiddleware)  # pyright: ignore
+    application.add_middleware(LogRequestMiddleware)
 
     if isinstance(settings, AppSetting):
         application.add_middleware(MetricMiddleware, app_name=settings.APP_NAME)
         application.add_route("/metrics", metrics)
+
+        # Setting openTelemetry exporter
+        setting_otlp(
+            application,
+            settings.APP_NAME,
+            f"{settings.OTLP_GRPC_ENDPOINT}",
+            settings.APP_ENV == EnviromentOption.PRODUCTION.value,
+        )
 
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.APP_API_PREFIX)
